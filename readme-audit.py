@@ -46,9 +46,4 @@ if readme_suffices:
 
 print("You need to update your README.")
 
-which_infrastructure()
-
-with open(the_readme) as file:
-    character_count = len(file.read())
-    while int(check_output('stat -c "%s" {:s}'.format(the_readme), shell=True, executable=bash_shell).decode('UTF-8')) == character_count:
-        os.system('{:s} {:s}'.format(os.getenv('EDITOR'), the_readme))
+which_infrastructure(the_readme, bash_shell)

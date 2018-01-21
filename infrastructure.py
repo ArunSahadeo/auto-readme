@@ -1,15 +1,16 @@
 import os
+from subprocess import check_output
 
-def which_infrastructure():
+def which_infrastructure(the_readme, bash_shell):
     
     if os.path.isdir(os.path.join(os.getcwd(), 'wp-includes').strip()) or os.path.isdir(os.path.join(os.getcwd(), 'wp-admin').strip()):
-        wordpress_install()
+        wordpress_install(the_readme, bash_shell)
     elif os.path.isfile(os.path.join(os.getcwd(), 'artisan')):
-        laravel_install()
+        laravel_install(the_readme, bash_shell)
     else:
-        standard_install()
+        standard_install(the_readme, bash_shell)
 
-def standard_install():
+def standard_install(the_readme, bash_shell):
     with open(the_readme) as file:
         character_count = len(file.read())
         while int(check_output('stat -c "%s" {:s}'.format(the_readme), shell=True, executable=bash_shell).decode('UTF-8')) == character_count:
