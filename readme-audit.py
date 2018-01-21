@@ -20,7 +20,7 @@ if not os.path.isfile(readme_path):
     print("README does not exist")
     sys.exit(1)
 
-commit_count = int(check_output('git log --oneline %(the_readme)s | wc -l' % locals(), shell=True, executable=bash_shell).decode('UTF-8'))
+commit_count = int(check_output('git log --oneline {:s} | wc -l'.format(the_readme), shell=True, executable=bash_shell).decode('UTF-8'))
 
 if commit_count > 1:
     print("Your README is up to date.")
@@ -48,4 +48,4 @@ print("You need to update your README.")
 with open(the_readme) as file:
     character_count = len(file.read())
     while int(check_output('stat -c "%s" {:s}'.format(the_readme), shell=True, executable=bash_shell).decode('UTF-8')) == character_count:
-        os.system('%s %s' % (os.getenv('EDITOR'), the_readme))
+        os.system('{:s} {:s}'.format(os.getenv('EDITOR'), the_readme))
