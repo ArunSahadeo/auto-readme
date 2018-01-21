@@ -42,3 +42,10 @@ for line in readme_contents:
 if readme_suffices:
     print("Your README suffices.")
     sys.exit(1)
+
+print("You need to update your README.")
+
+with open(the_readme) as file:
+    character_count = len(file.read())
+    while int(check_output('stat -c "%s" {:s}'.format(the_readme), shell=True, executable=bash_shell).decode('UTF-8')) == character_count:
+        os.system('%s %s' % (os.getenv('EDITOR'), the_readme))
