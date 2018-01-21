@@ -2,7 +2,15 @@ from subprocess import check_output
 from pathlib import Path
 import os, sys
 
-the_readme = check_output('find . -maxdepth 1 -iname "readme.md" | sed "s|./||"', shell=True, executable='/bin/bash')
+def getBashShell(list):
+    for el in list:
+        if "bash" in el: return el
+
+available_shells = check_output('cat /etc/shells', shell=True).decode('UTF-8').splitlines()
+
+bash_shell = getBashShell(available_shells)
+
+the_readme = check_output('find . -maxdepth 1 -iname "readme.md" | sed "s|./||"', shell=True, executable=bash_shell)
 
 the_readme = the_readme.decode('UTF-8').strip()
 
@@ -12,13 +20,13 @@ if not os.path.isfile(readme_path):
     print("README does not exist")
     sys.exit(1)
 
-commit_count = int(check_output('git log --oneline %(the_readme)s | wc -l' % locals(), shell=True, executable='/bin/bash').decode('UTF-8'))
+commit_count = int(check_output('git log --oneline %(the_readme)s | wc -l' % locals(), shell=True, executable=bash_shell).decode('UTF-8'))
 
 if commit_count > 1:
     print("Your README is up to date.")
     sys.exit(1)
 
-output = check_output('compgen -ac', shell=True, executable='/bin/bash')
+output = check_output('compgen -ac', shell=True, executable=bash_shell)
 commands = output.splitlines()
 
 for line_number, line in enumerate(commands):
