@@ -1,5 +1,6 @@
 from subprocess import check_output
 from pathlib import Path
+from infrastructure import which_infrastructure
 import os, sys
 
 def getBashShell(list):
@@ -44,6 +45,9 @@ if readme_suffices:
     sys.exit(1)
 
 print("You need to update your README.")
+
+which_infrastructure()
+sys.exit(1)
 
 with open(the_readme) as file:
     character_count = len(file.read())
