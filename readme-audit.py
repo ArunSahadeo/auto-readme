@@ -47,7 +47,6 @@ if readme_suffices:
 print("You need to update your README.")
 
 which_infrastructure()
-sys.exit(1)
 
 with open(the_readme) as file:
     character_count = len(file.read())
