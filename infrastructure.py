@@ -39,7 +39,7 @@ def wordpress_install(the_readme, bash_shell):
         ('driver', '')
     ])
 
-    accepted_database_drivers = [
+    accepted_drivers = [
         'mysql',
     ]
 
@@ -73,9 +73,8 @@ def wordpress_install(the_readme, bash_shell):
         config_options = open(YAML_config, 'r')
         config_options = yaml.load(config_options)
 
-        for option in config_options:
-            if option.lower() == str('database_driver').lower():
-                connection_params['driver'] = config_options[option]
+        if config_options['database_driver'] and config_options['database_driver'] in accepted_drivers:
+            connection_params['driver'] = config_options['database_driver']
 
     except yaml.scanner.ScannerError as e:
         raise Exception(e)
