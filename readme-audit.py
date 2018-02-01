@@ -8,13 +8,10 @@ def getBashShell(list):
         if "bash" in el: return el
 
 available_shells = check_output('cat /etc/shells', shell=True).decode('UTF-8').splitlines()
-
 bash_shell = getBashShell(available_shells)
 
 the_readme = check_output('find . -maxdepth 1 -iname "readme.md" | sed "s|./||"', shell=True, executable=bash_shell)
-
 the_readme = the_readme.decode('UTF-8').strip()
-
 readme_path = os.path.join(os.getcwd(), the_readme).strip()
 
 if not os.path.isfile(readme_path):
@@ -45,5 +42,4 @@ if readme_suffices:
     sys.exit(1)
 
 print("You need to update your README.")
-
 which_infrastructure(the_readme, bash_shell)
