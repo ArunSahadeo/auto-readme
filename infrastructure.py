@@ -29,6 +29,30 @@ def which_infrastructure(the_readme, bash_shell):
     else:
         standard_install(the_readme, bash_shell)
 
+def parse_DB(db_params):
+    driver = db_params['driver']
+    theme_name = None
+    if driver.lower() == str('mysql').lower():
+        import pymysql.cursors
+        mysql_connection = pymysql.connect(
+            host=db_params['host'],
+            user=db_params['user'],
+            password=db_params['pass'],
+            db=db_params['database'],
+            charset=db_params['charset'],
+            cursorclass=pymysql.cursors.DictCursor
+        )
+    try:
+        with mysql_connection.cursor() as cursor:
+            sql = 'SELECT option_value FROM {:s}options WHERE option_name = "template"'.format(db_params['prefix'])
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            theme_name = result['option_value']
+    finally:
+        mysql_connection.close()
+
+    return theme_name
+
 def wordpress_install(the_readme, bash_shell):
     connection_params = dict([
         ('host', ''),
@@ -36,8 +60,11 @@ def wordpress_install(the_readme, bash_shell):
         ('user', ''),
         ('pass', ''),
         ('prefix', ''),
+        ('charset', ''),
         ('driver', '')
     ])
+
+    package_dependencies = []
 
     accepted_drivers = [
         'mysql',
@@ -65,6 +92,8 @@ def wordpress_install(the_readme, bash_shell):
             connection_params['pass'] = value
         elif key.lower() == str('table_prefix').lower():
             connection_params['prefix'] = value
+        elif key.lower() == str('db_charset').lower():
+            connection_params['charset'] = value
         else:
             continue
 
@@ -76,10 +105,31 @@ def wordpress_install(the_readme, bash_shell):
         if config_options['database_driver'] and config_options['database_driver'] in accepted_drivers:
             connection_params['driver'] = config_options['database_driver']
 
+        if config_options['dependencies']:
+            for dependency in config_options['dependencies']:
+                package_dependencies.append(dependency)
+
     except yaml.scanner.ScannerError as e:
         raise Exception(e)
     except Exception as e:
         print(type(e))
+
+    wp_theme = parse_DB(connection_params) if True else False
+
+    if not wp_theme:
+        raise Exception("No active theme could be found for this WordPress installation")
+        
+    path_to_theme = os.path.join(os.getcwd(), 'wp-content', 'themes', wp_theme)
+
+    if not os.path.isdir(path_to_theme):
+        raise Exception("{:s} is not a valid theme path".format(path_to_theme))
+        
+    os.chdir(path_to_theme)
+
+    for package_dependency in package_dependencies:
+        if os.path.isfile(os.path.join(os.getcwd(), package_dependency)):
+            print(package_dependency)
+            
 
 def laravel_install(the_readme, bash_shell):
     print("Laravel!!!")
